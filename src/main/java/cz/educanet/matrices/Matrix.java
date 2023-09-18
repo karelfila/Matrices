@@ -8,36 +8,66 @@ public class Matrix implements IMatrix {
         this.rawArray = rawArray;
     }
 
-    /**
-     * TODO: Implement
-     */
     @Override
     public IMatrix times(IMatrix matrix) {
-        return null;
+
+        Matrix matrix1 = new Matrix(rawArray);
+        Matrix matrix2 = (Matrix) matrix;
+        double[][] result = new double[matrix1.getRows()][matrix2.getColumns()];
+
+        if (matrix1.getColumns() != matrix2.getRows()) {
+            throw new IllegalArgumentException();
+        }
+
+        for (int i = 0; i < result.length; i++) {
+            for (int j = 0; j < result[i].length; j++) {
+                for (int k = 0; k < matrix1.getRows(); k++) {
+                    result[i][j] += (matrix1.get(i, k) * matrix2.get(k, j));
+                }
+            }
+        }
+        return new Matrix(result);
     }
 
-    /**
-     * TODO: Implement
-     */
     @Override
     public IMatrix times(Number scalar) {
-        return null;
+
+        double[][] matrix = rawArray;
+
+        int number = (int) scalar;
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix.length; j++) {
+                matrix[i][j] *= number;
+            }
+        }
+        return new Matrix(matrix);
+
     }
 
-    /**
-     * TODO: Implement
-     */
     @Override
     public IMatrix add(IMatrix matrix) {
-        return null;
+
+        double[][] sumMatrix = rawArray;
+
+        for (int i = 0; i < sumMatrix.length; i++)
+            for (int j = 0; j < sumMatrix.length; j++)
+                sumMatrix[i][j] += matrix.get(i, j);
+
+        return new Matrix(sumMatrix);
     }
 
-    /**
-     * TODO: Implement
-     */
     @Override
     public IMatrix transpose() {
-        return null;
+
+        double[][] transpose = new double[this.getColumns()][this.getRows()];
+
+        for (int i = 0; i < this.getRows(); i++) {
+            for (int j = 0; j < this.getColumns(); j++) {
+                transpose[j][i] = this.rawArray[i][j];
+            }
+        }
+
+        return MatrixFactory.instance.create(transpose);
     }
 
     /**
@@ -48,20 +78,27 @@ public class Matrix implements IMatrix {
         return 0;
     }
 
-    /**
-     * TODO: Implement
-     */
     @Override
     public boolean isSquare() {
-        return false;
+        return this.getRows() == this.getColumns();
     }
 
-    /**
-     * TODO: Implement
-     */
+
     @Override
     public boolean isDiagonal() {
-        return false;
+
+        if (!this.isSquare()) {
+            return false;
+        }
+
+        for (int i = 0; i < this.getRows(); i++) {
+            for (int j = 0; j < this.getColumns(); j++) {
+                if (i != j && this.rawArray[i][j] != 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -69,7 +106,16 @@ public class Matrix implements IMatrix {
      */
     @Override
     public Number getTrace() {
-        return null;
+        if (!this.isSquare()) {
+            throw new UnsupportedOperationException();
+        }
+
+        double trace = 0;
+        for (int i = 0; i < this.getRows(); i++) {
+            trace += this.rawArray[i][i];
+        }
+
+        return trace;
     }
 
     @Override
@@ -81,13 +127,12 @@ public class Matrix implements IMatrix {
     public int getColumns() {
         if (getRows() > 0)
             return rawArray[0].length;
-
         return 0;
     }
 
     @Override
     public double get(int n, int m) {
-        if(n >= getRows() || n < 0 || m >= getColumns() || m < 0)
+        if (n >= getRows() || n < 0 || m >= getColumns() || m < 0)
             throw new IllegalArgumentException();
 
         return rawArray[n][m];

@@ -10,6 +10,8 @@ public interface IMatrix {
      */
     IMatrix times(IMatrix matrix);
 
+
+
     /**
      * Multiplies the matrix with a number.
      *
